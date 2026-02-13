@@ -1,4 +1,7 @@
-# Heston Pricer & Calibration Toolkit
+# Volatility Models: Pricing & Calibration Framework
+
+This repository currently implements the Heston (1993) stochastic volatility model,
+with a modular design intended to support additional volatility models.
 
 Vectorized Heston (1993) option pricer and full calibration pipeline for implied volatility surfaces, implemented as a reusable Python package.
 
@@ -6,16 +9,20 @@ The project is designed for robust calibration, numerical stability, and practic
 
 ---
 
-## Features
+### Features
+- Vectorized Heston (1993) vanilla pricer (Gauss–Laguerre)
+- Black–Scholes utilities (price, vega, implied volatility)
+- IV surface ingestion from Bloomberg-style tables
+- Robust calibration (DE + L-BFGS-B)
+- Diagnostic plots and calibration reports
 
-- Vectorized Heston vanilla pricer supporting many strikes per maturity with a single characteristic function evaluation.
-- Gauss–Laguerre quadrature (P1/P2 formulation) with numerical stability enhancements.
-- NEW: Heston vanilla pricing via sinh-acceleration, enabling faster and more stable numerical integration for oscillatory Fourier integrals.
-- Black–Scholes utilities: price, vega, and implied volatility solver.
-- Robust implied volatility inversion using Brent’s method with dynamic bracketing.
-- Calibration workflow based on Differential Evolution followed by L-BFGS-B local refinement.
-- Vega-weighted loss function, reducing the impact of noisy deep OTM options.
-- Visual validation tools for bid/ask and model-implied volatility smiles.
+---
+
+### Planned extensions
+- Rough Heston
+- SABR / Dynamic SABR
+- Local volatility (Dupire)
+- Stochastic local volatility (SLV)
 
 ---
 

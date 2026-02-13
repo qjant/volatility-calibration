@@ -9,7 +9,7 @@ parameter estimation using global and local optimizers.
 High-level flow
 ---------------
 1) Data import
-   - Load spot and valuation date (via 'adapt_excel' in convert_df).
+   - Load spot and valuation date (via 'load_iv_table' in convert_df).
    - Convert moneyness to effective strikes using the implied forward.
    - Compute market option prices (calls/puts) via Black-Scholes using the quoted IV.
 
@@ -77,16 +77,16 @@ from pathlib import Path
 import os
 
 # Project modules
-from heston_model_calibration.utils import market_data_preprocessing as dp
-from heston_model_calibration.pricing import black_scholes as bs
-from heston_model_calibration.pricing import heston as hp
+from market_data import preprocessing
+from heston.pricer import black_scholes as bs
+import heston.pricer.laguerre as hp
 
 
 ########################################################################
 ############################## FILE IMPORT #############################
 # Volatility file & folder:
 # - 'book_name' must exist inside 'folder_name'.
-# - dp.adapt_excel returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
+# - preprocessing.load_iv_table returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
 # Ruta a este archivo
 THIS_FILE = Path(__file__).resolve()
 
@@ -99,7 +99,7 @@ BOOK_NAME = 'SPX_17_10_25.xlsx'
 SHEET_NAME = 'Mid'
 folder_name = ''
 ticker = BOOK_NAME.split('_')[0]
-S0, act_date, df = dp.adapt_excel(DATA_DIR, BOOK_NAME, SHEET_NAME)
+S0, act_date, df = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, SHEET_NAME)
 ########################################################################
 
 
@@ -456,10 +456,10 @@ df['Heston IV'] = df.apply(
 )
 
 # Bid/Ask sheets (if available)
-_, _, df_bid = dp.adapt_excel(DATA_DIR, BOOK_NAME, 'Bid')
+_, _, df_bid = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, 'Bid')
 df_bid = df_bid[df_bid["IV"] > 0]
 
-_, _, df_ask = dp.adapt_excel(DATA_DIR, BOOK_NAME, 'Ask')
+_, _, df_ask = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, 'Ask')
 df_ask = df_ask[df_ask["IV"] > 0]
 
 # Align moneyness & expiries with main set

@@ -30,7 +30,7 @@ and returns the spot value, snapshot date, and a normalized DataFrame.
 """
 
 
-def adapt_excel(folder, file, sheet, save=False, absolute_route=False):
+def load_iv_table(folder, file, sheet, save=False, absolute_route=False):
     """
     Load and reformat a Bloomberg-style implied volatility table.
 
