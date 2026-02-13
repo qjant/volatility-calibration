@@ -247,7 +247,7 @@ if __name__ == "__main__":
     fwd = spot * np.exp((r - q) * tau)
     K = np.linspace(0.7 * fwd, 1.3 * fwd, 100)
 
-    nruns = 10000
+    nruns = 10_000
     n_opts = K.size
 
     t0 = time.perf_counter()

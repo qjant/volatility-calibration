@@ -1,0 +1,18 @@
+# Python build artifacts
+*.egg-info/
+build/
+dist/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
