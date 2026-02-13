@@ -1,16 +1,16 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "quant-pricing"
-version = "0.1.0"
+name = "heston-calibration"
+version = "1.0.0"
 description = "Quantitative pricing, calibration and simulation models (Black-Scholes, Heston, etc.)"
 readme = "README.md"
 requires-python = ">=3.9"
 
 authors = [
-  { name = "Alberto Guilabert", email = "TU_EMAIL_AQUI" }
+  { name = "qjant", email = "agm324ua@gmail.com" }
 ]
 
 dependencies = [

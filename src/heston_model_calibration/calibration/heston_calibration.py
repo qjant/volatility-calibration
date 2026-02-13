@@ -73,24 +73,33 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import differential_evolution
 from datetime import datetime
+from pathlib import Path
 import os
 
 # Project modules
-import convert_df as conv
-import black_scholes_calculator as bs
-import heston_vanilla_pricer as hp
+from heston_model_calibration.utils import market_data_preprocessing as dp
+from heston_model_calibration.pricing import black_scholes as bs
+from heston_model_calibration.pricing import heston as hp
 
 
 ########################################################################
 ############################## FILE IMPORT #############################
 # Volatility file & folder:
 # - 'book_name' must exist inside 'folder_name'.
-# - conv.adapt_excel returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
-book_name = 'SPX_17_10_25.xlsx'
-sheet_name = 'Mid'
+# - dp.adapt_excel returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
+# Ruta a este archivo
+THIS_FILE = Path(__file__).resolve()
+
+# Raíz del proyecto (repo)
+PROJECT_ROOT = THIS_FILE.parents[3]
+
+# Ruta al Excel
+DATA_DIR = PROJECT_ROOT / "data" / "spx"
+BOOK_NAME = 'SPX_17_10_25.xlsx'
+SHEET_NAME = 'Mid'
 folder_name = ''
-ticker = book_name.split('_')[0]
-S0, act_date, df = conv.adapt_excel(folder_name, book_name, sheet_name)
+ticker = BOOK_NAME.split('_')[0]
+S0, act_date, df = dp.adapt_excel(DATA_DIR, BOOK_NAME, SHEET_NAME)
 ########################################################################
 
 
@@ -423,10 +432,10 @@ df['Heston IV'] = df.apply(
 )
 
 # Bid/Ask sheets (if available)
-_, _, df_bid = conv.adapt_excel(folder_name, book_name, 'Bid')
+_, _, df_bid = dp.adapt_excel(DATA_DIR, BOOK_NAME, 'Bid')
 df_bid = df_bid[df_bid["IV"] > 0]
 
-_, _, df_ask = conv.adapt_excel(folder_name, book_name, 'Ask')
+_, _, df_ask = dp.adapt_excel(DATA_DIR, BOOK_NAME, 'Ask')
 df_ask = df_ask[df_ask["IV"] > 0]
 
 # Align moneyness & expiries with main set
