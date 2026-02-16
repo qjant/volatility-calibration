@@ -50,10 +50,7 @@ heston-model-calibration/
         └── utils/
             ├── __init__.py
             └── market_data_preprocessing.py
-
-The project follows a package layout to prevent accidental imports from the working directory and to enforce correct installation via pip.
-
----
+```
 
 ## Installation
 
