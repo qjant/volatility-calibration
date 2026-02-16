@@ -40,17 +40,17 @@ The project is designed for robust calibration, numerical stability, and practic
 ## Repository Structure
 
 ```text
-volcal/
+volcal/                                     (repo root)
 ├── pyproject.toml
 ├── README.md
-├── data/
+├── data/                                   (example market data, not packaged)
 │   ├── spx/
 │   |   └── SPX_17_10_25.xlsx
 |   └── googl/
 |       └── GOOGL_16_12_25.xlsx
-├── examples/
-└── src/
-    └── volcal/
+├── examples/                               (usage examples / notebooks)
+└── src/                                    (Python package contents)
+    └── volcal/                             (volatility calibration package)
         |
         ├── heston/
         |   ├── calibrator/
@@ -65,9 +65,9 @@ volcal/
         |   └── pricer/
         |       └── hagan/
         |           └── price.py
-        ├── utils/
+        ├── utils/                          (shared utilities)
         |   └── black_scholes.py
-        └── market_data/
+        └── market_data/                    (data adapters & preprocessing)
             └── preprocessing.py
 
 ```
