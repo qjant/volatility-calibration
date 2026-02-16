@@ -159,15 +159,18 @@ def compute_price_heston_sinh(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     strikes = np.atleast_1d(np.asarray(strikes, dtype=float))
 
-    w1 = np.asarray(sinh_cfg["w1"], dtype=float)
-    w = np.asarray(sinh_cfg["w"], dtype=float)
-    b = np.asarray(sinh_cfg["b"], dtype=float)
-    zt = np.asarray(sinh_cfg["zt"], dtype=float)
+    w1 = np.atleast_1d(np.asarray(sinh_cfg["w1"], dtype=float))
+    w = np.atleast_1d(np.asarray(sinh_cfg["w"], dtype=float))
+    b = np.atleast_1d(np.asarray(sinh_cfg["b"], dtype=float))
+    zt = np.atleast_1d(np.asarray(sinh_cfg["zt"], dtype=float))
 
-    zeta = np.asarray(trap_cfg["zeta"], dtype=float)
-    Lambda = np.asarray(trap_cfg["Lambda"], dtype=float)
+    zeta = np.atleast_1d(np.asarray(trap_cfg["zeta"], dtype=float))
+    Lambda = np.atleast_1d(np.asarray(trap_cfg["Lambda"], dtype=float))
 
     if strikes.shape != w1.shape:
+        print(strikes)
+        print(w1)
+
         raise ValueError("Shapes mismatch: provide configs computed for the same strike grid.")
 
     Nk = np.ceil(Lambda / zeta).astype(int)
@@ -225,11 +228,12 @@ def compute_price_heston_sinh(
     return call, put, covered_call
 
 
-def vanilla_price(T: float, K: np.ndarray, option_params: tuple, heston_params: dict):
+def vanilla_price(T: float, K: np.ndarray, option_params: tuple, heston_params: dict, option_type: np.ndarray, N):
     """Convenience wrapper: returns (calls, puts, covered_call) for given strike grid."""
     spot, r, q = option_params
     sinh_cfg, trap_cfg = sinh_trap_params_heston(T, K, spot, r, q, heston_params, eps=1e-12, safety=0.95)
-    return compute_price_heston_sinh(T, K, spot, r, q, heston_params, sinh_cfg, trap_cfg)
+    calls, puts, _ = compute_price_heston_sinh(T, K, spot, r, q, heston_params, sinh_cfg, trap_cfg)
+    return np.where(option_type == "call", calls, puts)
 
 
 # ======================================================================================

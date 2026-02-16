@@ -10,7 +10,7 @@ from pathlib import Path
 import os
 
 # Project modules
-from volcal.market_data import preprocessing
+from volcal.market_data.preprocessing import DataLoader
 from volcal.utils import black_scholes as bs
 import volcal.heston.pricer.laguerre as hp
 
@@ -20,26 +20,13 @@ import volcal.heston.pricer.laguerre as hp
 # Volatility file & folder:
 # - 'book_name' must exist inside 'folder_name'.
 # - preprocessing.load_iv_table returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
-REPO_ROOT = Path(__file__).resolve().parents[4]   # .../volcal
-
-# Ruta al Excel
+REPO_ROOT = Path(__file__).resolve().parents[4]
 DATA_DIR = REPO_ROOT / "data" / "spx"
 BOOK_NAME = 'SPX_17_10_25.xlsx'
-SHEET_NAME = 'Mid'
-folder_name = ''
-ticker = BOOK_NAME.split('_')[0]
-S0, act_date, df = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, SHEET_NAME)
-########################################################################
 
-
-########################################################################
-############################ SPOT AND RATES ############################
-# Common option parameters:
-# - S0: spot
-# - r : risk-free rate (column 'Risk Free', continuous comp.)
-# - q : dividend/repo yield (column 'Impl (Yld)', continuous comp.)
+loader = DataLoader(DATA_DIR, BOOK_NAME)
+S0, act_date, df = loader.load_iv_table('Mid')
 option_args = (S0, df['Risk Free'], df['Impl (Yld)'])
-# Note: reading spot from the Excel avoids hardcoding externally.
 ########################################################################
 
 
@@ -385,10 +372,10 @@ df['Heston IV'] = df.apply(
 )
 
 # Bid/Ask sheets (if available)
-_, _, df_bid = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, 'Bid')
+_, _, df_bid = loader.load_iv_table('Bid')
 df_bid = df_bid[df_bid["IV"] > 0]
 
-_, _, df_ask = preprocessing.load_iv_table(DATA_DIR, BOOK_NAME, 'Ask')
+_, _, df_ask = loader.load_iv_table('Ask')
 df_ask = df_ask[df_ask["IV"] > 0]
 
 # Align moneyness & expiries with main set
