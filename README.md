@@ -39,17 +39,17 @@ heston-model-calibration/
 └── src/
     └── heston_model_calibration/
         ├── __init__.py
-        ├── calibration/
+        ├── calibrator/
         │   ├── __init__.py
-        │   └── heston_calibration.py
-        ├── pricing/
+        │   └── heston.py
+        ├── pricer/
         │   ├── __init__.py
         │   ├── black_scholes.py
-        │   ├── heston.py
-        │   └── heston_sinh.py
-        └── utils/
+        │   ├── laguerre.py
+        │   └── sinh.py
+        └── market_data/
             ├── __init__.py
-            └── market_data_preprocessing.py
+            └── preprocessing.py
 ```
 
 ## Installation
