@@ -100,6 +100,7 @@ https://doi.org/10.1093/rfs/6.2.327
 Gatheral, J. (2006).
 The Volatility Surface: A Practitioner’s Guide.
 Wiley Finance Series.
+https://doi.org/10.1002/9781119202073
 
 Albrecher, H., Mayer, P., Schoutens, W., & Tistaert, J. (2007).
 The Little Heston Trap.
