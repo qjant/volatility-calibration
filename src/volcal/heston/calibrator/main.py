@@ -1,70 +1,3 @@
-"""
-Main script — Heston model calibration
--------------------------------------
-
-This script calibrates the Heston (1993) model to implied-volatility data
-loaded from Excel/CSV. It wires the full flow from data import through
-parameter estimation using global and local optimizers.
-
-High-level flow
----------------
-1) Data import
-   - Load spot and valuation date (via 'load_iv_table' in convert_df).
-   - Convert moneyness to effective strikes using the implied forward.
-   - Compute market option prices (calls/puts) via Black-Scholes using the quoted IV.
-
-2) Preprocessing
-   - Filter for positive IV.
-   - Check and enforce put/call parity in market prices.
-   - Select a reasonable moneyness band (e.g., 80%-120%) and representative maturities.
-   - Normalize indices.
-
-3) Loss function
-   - MSE in prices with vega weights: See http://dx.doi.org/10.22201/fca.24488410e.2022.2789
-   - Vectorized by maturity (one CF for multiple strikes).
-
-5) Optimization callbacks
-   - Differential Evolution (global): iteration logging and early-stopping by no-improvement/time.
-   - L-BFGS-B (local): track loss every iteration.
-
-6) Parameter initialization
-   - v0 ≈ (ATM IV of shortest tenor)^2.
-   - theta = v0; kappa ≈ 3; sigma ≈ 0.5; rho ≈ -0.5; lambda = 0 (fixed).
-   - Future: integrate last valid calibrations (< 1 month) as prior.
-
-7) Sanity checks
-   - Validate put/call parity under Heston with the initial seed.
-
-8) Calibration
-   - Global stage: differential_evolution.
-   - Local refinement: L-BFGS-B.
-   - Report optimal params, final loss, and Feller condition.
-
-Dependencies
-------------
-- pandas, numpy, scipy, matplotlib, os
-- Local modules:
-  * convert_df: Excel/CSV reading and adaptation.
-  * black_scholes_calculator: BS prices, vega, IV solver.
-  * heston_vanilla_pricer: Heston pricer.
-
-Inputs
-------
-- Excel/CSV with implied-vol data (e.g., SPX_YY_MM_DD.xlsx).
-
-Outputs
--------
-- Optimal Heston parameters (v0, kappa, theta, sigma, rho, lambda).
-- Calibration and convergence logs.
-- Validation (put/call parity; Feller condition).
-
-Notes
------
-- Calibration is under the risk-neutral measure (lambda = 0).
-- Callbacks give real-time traceability of the fit.
-"""
-
-# Standard/third-party libs
 import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (kept for potential 3D plots)
@@ -78,7 +11,7 @@ import os
 
 # Project modules
 from market_data import preprocessing
-from heston.pricer import black_scholes as bs
+from utils import black_scholes as bs
 import heston.pricer.laguerre as hp
 
 
