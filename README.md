@@ -3,8 +3,8 @@
 A modular Python framework for pricing and calibrating option pricing models,
 with an initial focus on stochastic volatility models.
 
-The current implementation includes a full Heston (1993) pipeline,
-serving as the reference model for the framework design.
+The current implementation includes a full Heston (1993) and SABR (2002) pipelines,
+serving as the reference models for the framework design.
 
 The project is designed for robust calibration, numerical stability, and practical use in equity derivatives research.
 
@@ -21,7 +21,9 @@ The project is designed for robust calibration, numerical stability, and practic
 - Heston (1993)
   - Gauss–Laguerre pricer
   - Sinh-acceleration pricer
-  - Full implied-volatility surface calibration
+
+- SABR (2002)
+  - Hagan approximation pricer
 
 
 ### Roadmap
