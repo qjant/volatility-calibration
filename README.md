@@ -16,7 +16,6 @@ The project is designed for robust calibration, numerical stability, and practic
 - Robust calibration pipelines (DE + L-BFGS-B)
 - Diagnostic plots and calibration reports
 
----
 
 ### Current model support
 - Heston (1993)
@@ -24,7 +23,6 @@ The project is designed for robust calibration, numerical stability, and practic
   - Sinh-acceleration pricer
   - Full implied-volatility surface calibration
 
----
 
 ### Roadmap
 - Rough Heston
