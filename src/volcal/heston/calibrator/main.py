@@ -1,22 +1,18 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (kept for potential 3D plots)
-import matplotlib.ticker as mtick
 import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import differential_evolution
 from datetime import datetime
 from pathlib import Path
-import os
 
 # Project modules
 from volcal.market_data.preprocessing import DataLoader
 from volcal.utils import black_scholes as bs
-import volcal.heston.pricer.laguerre.price as hp
+from ..pricer.laguerre import price as hp
+from .refine_data import refine_data
 
 
-########################################################################
-############################## FILE IMPORT #############################
+############################## IMPORT DATA #############################
 # Volatility file & folder:
 # - 'book_name' must exist inside 'folder_name'.
 # - preprocessing.load_iv_table returns: Spot (S0), valuation date (act_date), and adapted DataFrame.
@@ -27,95 +23,10 @@ BOOK_NAME = 'SPX_17_10_25.xlsx'
 loader = DataLoader(DATA_DIR, BOOK_NAME)
 S0, act_date, df = loader.load_iv_table('Mid')
 option_args = (S0, df['Risk Free'], df['Impl (Yld)'])
-########################################################################
 
 
-########################################################################
-########################### DATA TREATMENT #############################
-# Time-to-expiry (years) from valuation date:
-t_val = pd.to_datetime(act_date)
-df['Exp Date'] = pd.to_datetime(df['Exp Date'], dayfirst=True, errors='coerce')
-maturities = df['Exp Date'].unique()
-df['To expiry'] = (df['Exp Date'] - t_val).dt.days / 365
-
-# Theoretical forward and consistency with 'ImplFwd':
-df['CalcFwd'] = S0 * np.exp((df['Risk Free'] - df['Impl (Yld)']) * df['To expiry'])
-# Enforce implied forward consistency:
-df['ImplFwd'] = df['CalcFwd']
-
-# Effective strike = forward * moneyness:
-df["Strike"] = df["ImplFwd"] * df["Moneyness"]
-
-# Basic filter: keep positive IV only.
-df = df[df["IV"] > 0]
-
-# Market prices (BS) for each observation (call and put) using quoted IV:
-df['Market call price'] = df.apply(
-    lambda row: bs.price(
-        iv=row['IV'],
-        T=row['To expiry'],
-        K=row['Strike'],
-        option_params=(S0, row['Risk Free'], row['Impl (Yld)']),
-        option_type='call'
-    ),
-    axis=1
-)
-df['Market put price'] = df.apply(
-    lambda row: bs.price(
-        iv=row['IV'],
-        T=row['To expiry'],
-        K=row['Strike'],
-        option_params=(S0, row['Risk Free'], row['Impl (Yld)']),
-        option_type='put'
-    ),
-    axis=1
-)
-
-# Put/call parity check on market data:
-df['Market put price C/P'] = (
-    df['Market call price']
-    + df['Strike'] * np.exp(-df['Risk Free'] * df['To expiry'])
-    - S0 * np.exp(-df['Impl (Yld)'] * df['To expiry'])
-)
-print("\nPut/Call parity check (market):",
-      np.max(df['Market put price'] - df['Market put price C/P']) < 1e-10)
-
-# Redundant safety filter: strictly positive prices
-df = df[(df['Market put price'] > 0) & (df['Market call price'] > 0)]
-
-# Liquidity filter by moneyness (reasonable trading zone)
-mn_low = 0.8
-mn_high = 1.2
-df = df[(df['Moneyness'] >= mn_low) & (df['Moneyness'] <= mn_high)]
-mn_low = df['Moneyness'].min()
-mn_high = df['Moneyness'].max()
-
-# Clean reindex
-df = df.reset_index(drop=True)
-
-print("\nData batch size: {} points\n".format(df.shape[0]))
-########################################################################
-
-
-########################################################################
-######################### SIMULATION OPTIONS ###########################
-# Choose option type per row by moneyness (simple OTM/ITM split)
-# The procedure is independent of this choice due to the call/put parity
-# and the functional form of the loss functions
-df['Option type'] = np.where(df['Moneyness'] >= 1, 'call', 'put')
-df['Market price'] = np.where(df['Moneyness'] >= 1, df['Market call price'], df['Market put price'])
-
-# Compute BS vega for weighting (prevents tiny OTM prices from dominating)
-df["Vega"] = df.apply(
-    lambda row: bs.vega(
-        iv=row['IV'],
-        T=row['To expiry'],
-        K=row['Strike'],
-        option_params=(S0, row['Risk Free'], row['Impl (Yld)']),
-    ),
-    axis=1
-)
-########################################################################
+# Refine input data
+df = refine_data(S0, act_date, df, mn_low=0.8, mn_high=1.2, vega=True, trading_days=252, market_quote="otm")
 
 
 # ---- Parameter mapping (single source of truth) ----
@@ -374,6 +285,7 @@ df['Heston IV'] = df.apply(
 # Bid/Ask sheets (if available)
 _, _, df_bid = loader.load_iv_table('Bid')
 df_bid = df_bid[df_bid["IV"] > 0]
+print(df_bid)
 
 _, _, df_ask = loader.load_iv_table('Ask')
 df_ask = df_ask[df_ask["IV"] > 0]
@@ -387,17 +299,18 @@ df_ask = df_ask[df_ask['Expiry'].isin(df['Expiry'])]
 # Recompute time-to-expiry on bid/ask
 df_bid['Exp Date'] = pd.to_datetime(df_bid['Exp Date'], dayfirst=True, errors='coerce')
 maturities = df_bid['Exp Date'].unique()
-df_bid['To expiry'] = (df_bid['Exp Date'] - t_val).dt.days / 365
+df_bid['To expiry'] = (df_bid['Exp Date'] - pd.to_datetime(act_date)).dt.days / 252
 
 df_ask['Exp Date'] = pd.to_datetime(df_ask['Exp Date'], dayfirst=True, errors='coerce')
 maturities = df_ask['Exp Date'].unique()
-df_ask['To expiry'] = (df_ask['Exp Date'] - t_val).dt.days / 365
+df_ask['To expiry'] = (df_ask['Exp Date'] - pd.to_datetime(act_date)).dt.days / 252
 
 # Clean reindex
 df = df.reset_index(drop=True)
 
 # Plot smiles per maturity
-mn_grid = np.linspace(mn_low, mn_high, 300)
+import matplotlib.pyplot as plt
+mn_grid = np.linspace(0.8, 1.2, 300)
 for Tj in sorted(df['To expiry'].unique()):
     # Market subsets
     aux = df[df['To expiry'] == Tj]
