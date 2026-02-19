@@ -15,15 +15,15 @@ Implementation of the Heston (1993) stochastic volatility model.
 
 ### Calibration output (IV smile fit)
 
-<p align="center">
+<div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap;">
   <img src="../../../docs/img/fit_iv_smile_spx_17_10_25_3M.png" width="400" alt="smile fit - 17/10/2025 - tenor 3M" />
   <img src="../../../docs/img/fit_iv_smile_spx_17_10_25_6M.png" width="400" alt="smile fit - 17/10/2025 - tenor 6M" />
-</p>
+</div>
 
-<p align="center">
+<div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap;">
   <img src="../../../docs/img/fit_iv_smile_spx_17_10_25_9M.png" width="400" alt="smile fit - 17/10/2025 - tenor 9M" />
   <img src="../../../docs/img/fit_iv_smile_spx_17_10_25_1Y.png" width="400" alt="smile fit - 17/10/2025 - tenor 1Y" />
-</p>
+</div>
 
 ```
 ==============================================================================================
