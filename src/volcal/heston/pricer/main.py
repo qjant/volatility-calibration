@@ -15,7 +15,7 @@ class HestonPricer:
         self.method: Method = method
         self._engine = price_laguerre if method == "laguerre" else price_sinh
 
-        # defaults (se pueden sobreescribir con .config())
+        # defaults
         self.N: int = 185          # laguerre
         self.eps: float = 1e-12    # sinh
         self.safety: float = 0.95  # sinh
@@ -44,7 +44,7 @@ class HestonPricer:
             if "safety" in kwargs:
                 self.safety = float(kwargs["safety"])
 
-        return self  # permite chaining: HestonPricer(...).config(...)
+        return self
 
     def set_method(self, method: Method) -> "HestonPricer":
         self.method = method
@@ -90,11 +90,9 @@ class HestonPricer:
 
 
 
-
-
-
-
-
+# ======================================================================================
+# Example usage
+# ======================================================================================
 if __name__ == "__main__":
     import numpy as np
 

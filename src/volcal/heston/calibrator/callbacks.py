@@ -17,7 +17,6 @@ def _fmt_sci(x: float) -> str:
     return f"{x: .3e}"
 
 def _fmt_params(p: dict[str, float], *, max_items: int = 6) -> str:
-    # Stable order as given by dict insertion order (your vec_to_params should preserve it).
     items = list(p.items())
     shown = items[:max_items]
     body = " ".join(f"{k}={v: .6g}" for k, v in shown)

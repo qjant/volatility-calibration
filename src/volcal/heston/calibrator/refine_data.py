@@ -91,7 +91,7 @@ def refine_data(
 
     # Ensure that expiration dates are in datetime format
     # to compute the time to expiry as a year_frac
-    # NOTE: 252 trading days are assumed by default.
+    # WARNING: 252 trading days are assumed by default.
     df['Exp Date'] = pd.to_datetime(df['Exp Date'], dayfirst=True, errors='coerce')
     df['To expiry'] = (df['Exp Date'] - t_val).dt.days / trading_days
 

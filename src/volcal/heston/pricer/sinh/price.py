@@ -247,8 +247,10 @@ def vanilla_price(T: float,
     return np.where(option_type == "call", calls, puts)
 
 
+
+
 # ======================================================================================
-# Example usage + profiling
+# Example usage
 # ======================================================================================
 if __name__ == "__main__":
     heston_params = {"kappa": 2, "theta": 0.0314, "sigma": 1.2, "v0": 0.04125, "rho": -0.73}
