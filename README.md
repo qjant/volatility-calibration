@@ -1,8 +1,6 @@
 # Volatility Models: Pricing & Calibration Framework
 
-![CI](https://img.shields.io/github/actions/workflow/status/qjant/volatility-calibration/ci.yml?branch=main)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![License](https://img.shields.io/github/license/qjant/volatility-calibration)
 ![Last commit](https://img.shields.io/github/last-commit/qjant/volatility-calibration)
 ![Repo size](https://img.shields.io/github/repo-size/qjant/volatility-calibration)
 
